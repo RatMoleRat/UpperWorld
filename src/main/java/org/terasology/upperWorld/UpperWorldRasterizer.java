@@ -34,51 +34,24 @@ public class UpperWorldRasterizer implements WorldRasterizer {
     public void generateChunk(CoreChunk chunk, Region chunkRegion) {
         Random rand = new Random();
         UpperWorldFacet facet = chunkRegion.getFacet(UpperWorldFacet.class);
-        if (chunkRegion.getRegion().maxY() > 10000) {
+        if (chunkRegion.getRegion().maxY() > 10000 && chunkRegion.getRegion().minY()<10000) {
             BaseVector3i heightInWorld = ChunkMath.calcBlockPos(new Vector3i(0, 10000, 0));
-            BaseVector3i min = new Vector3i(0, 10000+facet.getWorld((int)chunkRegion.getRegion().center().x, (int)chunkRegion.getRegion().center().z)-120, 0);
-            BaseVector3i max = new Vector3i(0, 10000+facet.getWorld((int)chunkRegion.getRegion().center().x, (int)chunkRegion.getRegion().center().z)+120, 0);
-            logger.info("max: "+max);
-            logger.info("min: "+min);
             for (Vector3i position : chunkRegion.getRegion()) {
-                position = new Vector3i(position.x, position.y + 10000, position.z);
+                position = new Vector3i(position.x, position.y, position.z);
                 float surfaceHeight = facet.getWorld(position.x, position.z);
-                surfaceHeight = ChunkMath.calcBlockPosY((int) surfaceHeight + 10000);
+                surfaceHeight = ChunkMath.calcBlockPosY((int) surfaceHeight);
+                position.y = (int)surfaceHeight;
                 AABB boundsOfObj = chunk.getBlock(ChunkMath.calcBlockPos(position)).getBounds(position);
-                if (ChunkMath.calcBlockPosY(position.y) < surfaceHeight && ChunkMath.calcBlockPosY(position.y) > min.y() && ChunkMath.calcBlockPosY(position.y) < max.y()) {
-                    if (surfaceHeight<10000){
-                        chunk.setBlock(ChunkMath.calcBlockPos(position), leaves);
-                        //adds water where it should
-                        for (float i=ChunkMath.calcBlockPosY(position.y); i<surfaceHeight; i+= (boundsOfObj.maxY()-boundsOfObj.minY())) {
-                            BaseVector3i positionOfNew = position;
-                            ((Vector3i) positionOfNew).y+=i*((int)boundsOfObj.maxY()-(int)boundsOfObj.minY());
-                            positionOfNew = ChunkMath.calcBlockPos((Vector3i)positionOfNew);
-                            chunkRegion.getRegion().expandToContain(positionOfNew);
-
-                            if (positionOfNew.y() < heightInWorld.y()) {
-                                chunk.setBlock(positionOfNew,water);
-                            }
-                        }
+                chunk.setBlock(ChunkMath.calcBlockPos(position), glass);
+                //possibly adds flowers
+                if (rand.nextInt(50) > 48) {
+                    BaseVector3i positionOfNew = position;
+                    ((Vector3i) positionOfNew).y += ((int) boundsOfObj.maxY() - (int) boundsOfObj.minY());
+                    positionOfNew = ChunkMath.calcBlockPos((Vector3i) positionOfNew);
+                    chunkRegion.getRegion().expandToContain(positionOfNew);
+                    if (positionOfNew.y() < 64) {
+                        chunk.setBlock(positionOfNew, glowbellBloom);
                     }
-                    else{
-                        chunk.setBlock(ChunkMath.calcBlockPos(position), glass);
-                        //possibly adds flowers
-                        if (rand.nextInt(9) > 7) {
-                            BaseVector3i positionOfNew = position;
-                            ((Vector3i) positionOfNew).y += ((int) boundsOfObj.maxY() - (int) boundsOfObj.minY());
-                            positionOfNew = ChunkMath.calcBlockPos((Vector3i) positionOfNew);
-                            chunkRegion.getRegion().expandToContain(positionOfNew);
-                            if (positionOfNew.y() < 64) {
-                                chunk.setBlock(positionOfNew, glowbellBloom);
-                            }
-                        }
-                        //random chance for leaves
-                        if (rand.nextInt(200) > 198) {
-                            chunk.setBlock(ChunkMath.calcBlockPos(position), leaves);
-                        }
-
-                    }
-
                 }
             }
         }

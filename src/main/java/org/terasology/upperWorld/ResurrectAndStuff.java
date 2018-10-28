@@ -92,7 +92,7 @@ public class ResurrectAndStuff extends BaseComponentSystem {
             for (BaseVector2i pos : facet.getWorldRegion().contents()) {
                 float surfaceHeight = facet.getWorld(pos);
                 logger.info("surfaceheight: " + surfaceHeight);
-                if (surfaceHeight > 10000) {
+                if (surfaceHeight > 9990) {
                     return new Vector3f(pos.x(), surfaceHeight + 20, pos.y());
                 }
             }

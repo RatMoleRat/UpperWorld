@@ -27,17 +27,13 @@ public class UpperWorldSurfaceProvider implements FacetProvider {
 
     @Override
     public void process(GeneratingRegion region) {
-        logger.info("begin");
         Border3D border = region.getBorderForFacet(UpperWorldFacet.class);
         UpperWorldFacet facet = new UpperWorldFacet(region.getRegion(), border);
-        logger.info("facetA: "+facet.toString());
-        logger.info("facetB: "+facet.toString());
         Rect2i processRegion = facet.getWorldRegion();
         for (BaseVector2i position:processRegion.contents()) {
             facet.setWorld(position, surfaceNoise.noise(position.x(),position.y())*20+10000);
         }
 
         region.setRegionFacet(UpperWorldFacet.class, facet);
-        logger.info("facetC: "+region.getRegionFacet(UpperWorldFacet.class));
     }
 }

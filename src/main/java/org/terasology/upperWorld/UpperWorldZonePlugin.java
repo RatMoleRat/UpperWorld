@@ -29,7 +29,9 @@ public class UpperWorldZonePlugin extends BaseFacetedWorldGenerator {
         ImmutableVector2i spawnPos = new ImmutableVector2i(0, 0);
         // for the basic world
         return new WorldBuilder(worldGenLib)
-                .setSeaLevel(0)
+                .setSeaLevel(32)
+                .addProvider(new UpperWorldSurfaceProvider())     //for the Upper World
+                .addRasterizer(new UpperWorldRasterizer()) //for the Upper World
                 .addProvider(new SeaLevelProvider(0))
                 .addProvider(new PerlinHumidityProvider())
                 .addProvider(new PerlinSurfaceTemperatureProvider())
@@ -41,11 +43,9 @@ public class UpperWorldZonePlugin extends BaseFacetedWorldGenerator {
                 .addProvider(new SurfaceToDensityProvider())
                 .addProvider(new DefaultFloraProvider())
                 .addProvider(new DefaultTreeProvider())
-                .addProvider(new PlateauProvider(spawnPos, 0 + 4, 5, 20))
+                .addProvider(new PlateauProvider(spawnPos, 4, 5, 20))
                 .addRasterizer(new SolidRasterizer())
-                .addRasterizer(new FloraRasterizer())
+                .addRasterizer(new FloraRasterizer());
 
-                .addProvider(new UpperWorldSurfaceProvider())     //for the Upper World
-                .addRasterizer(new UpperWorldRasterizer());  //for the Upper World
     }
 }

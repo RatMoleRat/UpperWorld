@@ -10,9 +10,8 @@ public class UpperWorldZonePlugin extends ZonePlugin {
 
     public UpperWorldZonePlugin() {
 
-        super("Plugin zone", new LayeredZoneRegionFunction(new MinMaxLayerThickness(1, 300), LayeredZoneRegionFunction.LayeredZoneOrdering.LOW_SKY));
+        super("Plugin", new LayeredZoneRegionFunction(new MinMaxLayerThickness(1, 1000), LayeredZoneRegionFunction.LayeredZoneOrdering.HIGH_SKY));
 
-        // Inferno
         addProvider(new SurfaceProvider());
         addRasterizer(new UpperWorldRasterizer());
     }

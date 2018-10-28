@@ -1,5 +1,6 @@
 {
     "displayName": "Blue Tinted Glass",
-    "categories" : ["bluetintglass"],
+    "categories" : ["BlueTintGlass"],
+    "shadowCasting": false,
     "hardness": 2
 }

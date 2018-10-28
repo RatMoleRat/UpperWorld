@@ -16,6 +16,7 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
 @Produces(SurfaceHeightFacet.class)
 public class SurfaceProvider implements FacetProvider {
     public Noise surfaceNoise;
+    public SurfaceHeightFacet facet;
 
     //for getting noise
     @Override
@@ -31,9 +32,10 @@ public class SurfaceProvider implements FacetProvider {
 
         Rect2i processRegion = facet.getWorldRegion();
         for (BaseVector2i position:processRegion.contents()) {
-            facet.setWorld(position, surfaceNoise.noise(position.x(),position.y())*20+200);
+            facet.setWorld(position, surfaceNoise.noise(position.x(),position.y())*20);
         }
 
         region.setRegionFacet(SurfaceHeightFacet.class, facet);
+        facet = region.getRegionFacet(SurfaceHeightFacet.class);
     }
 }

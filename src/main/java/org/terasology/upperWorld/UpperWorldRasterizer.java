@@ -27,7 +27,7 @@ public class UpperWorldRasterizer implements WorldRasterizer {
     public void initialize() {
         water = CoreRegistry.get(BlockManager.class).getBlock("Core:Water");
         leaves = CoreRegistry.get(BlockManager.class).getBlock("Core:GreenLeaf");
-        glass = CoreRegistry.get(BlockManager.class).getBlock("Core:Glass");
+        glass = CoreRegistry.get(BlockManager.class).getBlock("UpperWorld:BlueTintGlass");
         glowbellBloom = CoreRegistry.get(BlockManager.class).getBlock("Core:GlowbellBloom");
     }
 
@@ -35,13 +35,14 @@ public class UpperWorldRasterizer implements WorldRasterizer {
     public void generateChunk(CoreChunk chunk, Region chunkRegion) {
         Random rand = new Random();
         SurfaceHeightFacet surfaceHeightFacet = chunkRegion.getFacet(SurfaceHeightFacet.class);
-        BaseVector3i heightInWorld = ChunkMath.calcBlockPos(new Vector3i(0, 200, 0));
+        BaseVector3i heightInWorld = ChunkMath.calcBlockPos(new Vector3i(0, 1000, 0));
         for (Vector3i position : chunkRegion.getRegion()) {
             float surfaceHeight = surfaceHeightFacet.getWorld(position.x, position.z);
+            position = new Vector3i(position.x, position.y+1000, position.z);
+            surfaceHeight = ChunkMath.calcBlockPosY((int)surfaceHeight+1000);
             AABB boundsOfObj = chunk.getBlock(ChunkMath.calcBlockPos(position)).getBounds(position);
             if (position.y < surfaceHeight) {
-
-                if (surfaceHeight<200){
+                if (surfaceHeight<1000){
                     chunk.setBlock(ChunkMath.calcBlockPos(position), leaves);
                     //adds water where it should
                     for (float i=position.y; i<surfaceHeight; i+= (boundsOfObj.maxY()-boundsOfObj.minY())) {
@@ -59,7 +60,7 @@ public class UpperWorldRasterizer implements WorldRasterizer {
                 }
                 else{
                     chunk.setBlock(ChunkMath.calcBlockPos(position), glass);
-                    //possibly adds glowbellBloom
+                    //possibly adds grass
                     if (rand.nextInt(9)>7) {
                         BaseVector3i positionOfNew0 = ChunkMath.calcBlockPos(position);
                         BaseVector3i positionOfNew1 = positionOfNew0;
@@ -72,12 +73,12 @@ public class UpperWorldRasterizer implements WorldRasterizer {
                             chunk.setBlock(positionOfNew1,glowbellBloom);
                         }
                     }
-                    //random chance for leaves
-                    if (rand.nextInt(50)>45) {
-                        logger.info("position: "+ChunkMath.calcBlockPos(position));
+                    //random chance for dirt
+                    if (rand.nextInt(50)>48) {
                         chunk.setBlock(ChunkMath.calcBlockPos(position), leaves);
                     }
                 }
+
             }
         }
     }

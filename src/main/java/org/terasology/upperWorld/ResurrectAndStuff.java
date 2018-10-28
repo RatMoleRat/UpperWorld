@@ -21,7 +21,6 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.World;
 import org.terasology.world.generation.WorldRasterizer;
@@ -70,24 +69,24 @@ public class ResurrectAndStuff extends BaseComponentSystem {
         logger.info("teleported.");
     }
     public Vector3f findPosition(LocationComponent loc, World wor) {
-        Vector3i search = new Vector3i(100, 1000, 100);
+        Vector3i search = new Vector3i(100, 11000, 100);
         Vector3f center = loc.getWorldPosition();
-        Region3i area = Region3i.createFromCenterExtents(new Vector3i(center.x, center.y+1000, center.z), search);
+        Region3i area = Region3i.createFromCenterExtents(new Vector3i(center.x, center.y+200, center.z), search);
         Region worldRegion = wor.getWorldData(area);
 
-        UpperWorldFacet facet;
-        try {
-            facet = worldRegion.getFacet(UpperWorldFacet.class);
+        logger.info(worldRegion.toString());
+        for (int i=0; i<wor.getAllFacets().toArray().length; i++) {
+            logger.info(wor.getAllFacets().toArray()[i].toString());
         }
-        catch (NullPointerException n) {
-            facet = new UpperWorldFacet(area, new Border3D(28, 28, 28));
-            wor.getAllFacets().add(facet.getClass());
-            worldRegion = wor.getWorldData(area);
-        }
-        for (BaseVector2i pos : facet.getWorldRegion().contents()) {
-            float surfaceHeight = facet.getWorld(pos);
-            if (surfaceHeight > 1000) {
-                return new Vector3f(pos.x(), surfaceHeight + 1, pos.y());
+        UpperWorldFacet facet = worldRegion.getFacet(UpperWorldFacet.class);
+        if (facet != null) {
+            logger.info("not null!");
+            for (BaseVector2i pos : facet.getWorldRegion().contents()) {
+                float surfaceHeight = facet.getWorld(pos);
+                logger.info("surfaceheight: " + surfaceHeight);
+                if (surfaceHeight > 10000) {
+                    return new Vector3f(pos.x(), surfaceHeight + 1, pos.y());
+                }
             }
         }
         return null;

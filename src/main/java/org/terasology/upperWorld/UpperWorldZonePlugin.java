@@ -1,18 +1,51 @@
 package org.terasology.upperWorld;
 
-import org.terasology.world.generator.plugin.RegisterPlugin;
-import org.terasology.world.zones.LayeredZoneRegionFunction;
-import org.terasology.world.zones.MinMaxLayerThickness;
-import org.terasology.world.zones.ZonePlugin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.core.world.generator.facetProviders.*;
+import org.terasology.core.world.generator.rasterizers.FloraRasterizer;
+import org.terasology.core.world.generator.rasterizers.SolidRasterizer;
+import org.terasology.engine.SimpleUri;
+import org.terasology.math.geom.ImmutableVector2i;
+import org.terasology.registry.In;
+import org.terasology.world.generation.BaseFacetedWorldGenerator;
+import org.terasology.world.generation.WorldBuilder;
+import org.terasology.world.generator.RegisterWorldGenerator;
+import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
-@RegisterPlugin
-public class UpperWorldZonePlugin extends ZonePlugin {
+@RegisterWorldGenerator(id="upperworld", displayName = "Including Upper World")
+public class UpperWorldZonePlugin extends BaseFacetedWorldGenerator {
 
-    public UpperWorldZonePlugin() {
+    @In
+    WorldGeneratorPluginLibrary worldGenLib;
 
-        super("Plugin", new LayeredZoneRegionFunction(new MinMaxLayerThickness(1, 1000), LayeredZoneRegionFunction.LayeredZoneOrdering.HIGH_SKY));
+    private static Logger logger = LoggerFactory.getLogger(UpperWorldZonePlugin.class);
+    public UpperWorldZonePlugin(SimpleUri uri) {
+        super(uri);
+    }
 
-        addProvider(new SurfaceProvider());
-        addRasterizer(new UpperWorldRasterizer());
+    @Override
+    protected WorldBuilder createWorld() {
+        ImmutableVector2i spawnPos = new ImmutableVector2i(0, 0);
+        // for the basic world
+        return new WorldBuilder(worldGenLib)
+                .setSeaLevel(0)
+                .addProvider(new SeaLevelProvider(0))
+                .addProvider(new PerlinHumidityProvider())
+                .addProvider(new PerlinSurfaceTemperatureProvider())
+                .addProvider(new PerlinBaseSurfaceProvider())
+                .addProvider(new PerlinRiverProvider())
+                .addProvider(new PerlinOceanProvider())
+                .addProvider(new PerlinHillsAndMountainsProvider())
+                .addProvider(new BiomeProvider())
+                .addProvider(new SurfaceToDensityProvider())
+                .addProvider(new DefaultFloraProvider())
+                .addProvider(new DefaultTreeProvider())
+                .addProvider(new PlateauProvider(spawnPos, 0 + 4, 5, 20))
+                .addRasterizer(new SolidRasterizer())
+                .addRasterizer(new FloraRasterizer())
+
+                .addProvider(new UpperWorldSurfaceProvider())     //for the Upper World
+                .addRasterizer(new UpperWorldRasterizer());  //for the Upper World
     }
 }
